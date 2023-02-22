@@ -1,0 +1,1 @@
+exports.deploySTC = require("./deploySTC")
