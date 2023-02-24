@@ -2,12 +2,20 @@
 pragma solidity ^0.8.7;
 
 import "../dev/functions/FunctionsClient.sol";
-// TODO: import "@chainlink/contracts/src/v0.8/dev/functions/FunctionsClient.sol"; // Once published
-import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-import "@openzeppelin/contracts/utils/Strings.sol"; // for string utilities
+// import "@chainlink/contracts/src/v0.8/dev/functions/FunctionsClient.sol"; // Once published
+// import "https://github.com/smartcontractkit/functions-hardhat-starter-kit/blob/main/contracts/dev/functions/FunctionsClient.sol";
 
+import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol"; // NOTE: console.log only works in Hardhat local networks and the local functions simluation, not on testnets or mainnets.
+
+// TODO @Zubin cleanup
+interface IStableCoin is IERC20 {
+  function mint(address to, uint256 amount) external;
+
+  function decimals() external returns (uint8);
+}
 
 /**
  * @title Functions Copns contract
@@ -22,6 +30,10 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
   bytes public latestError;
   string public latestArtistRequestedId;
 
+  address public s_stc; // StableCoin address for payouts.
+
+  error RecordLabel_ArtistPaymentError(string artistId, uint256 payment, string errorMsg);
+
   struct Artist {
     string name;
     string email;
@@ -32,16 +44,19 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     address walletAddress;
   }
 
-  mapping(string => Artist) public artistData; // Mapping that uses the ArtistID as the key.
+  mapping(string => Artist) artistData; // Mapping that uses the ArtistID as the key.
 
   event OCRResponse(bytes32 indexed requestId, bytes result, bytes err);
+  event ArtistPaid(string artistId, uint256 amount);
 
   /**
    * @notice Executes once when a contract is created to initialize state variables
    *
    * @param oracle - The FunctionsOracle contract
    */
-  constructor(address oracle) FunctionsClient(oracle) ConfirmedOwner(msg.sender) {}
+  constructor(address oracle, address stablecoin) FunctionsClient(oracle) ConfirmedOwner(msg.sender) {
+    s_stc = stablecoin;
+  }
 
   /**
    * @notice Send a simple request
@@ -58,10 +73,9 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     uint64 subscriptionId,
     uint32 gasLimit
   ) public onlyOwner returns (bytes32) {
-
     Functions.Request memory req;
     req.initializeRequest(Functions.Location.Inline, Functions.CodeLanguage.JavaScript, source);
-    
+
     if (secrets.length > 0) {
       if (secretsLocation == Functions.Location.Inline) {
         req.addInlineSecrets(secrets);
@@ -88,8 +102,6 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
    * Either response or error parameter will be set, but never both
    */
   function fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) internal override {
-    // revert('test');
-    latestResponse = response;
     latestError = err;
     emit OCRResponse(requestId, response, err);
 
@@ -97,18 +109,27 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     // Artist gets a fixed rate for every addition 1000 active monthly listeners.
     bool nilErr = (err.length == 0);
     if (nilErr) {
-      uint256 latestListenerCount = abi.decode(response, (uint256));
-      console.log("\nLatest listener count : %s", latestListenerCount);
-      
-      // Update Artist Mapping.
       string memory artistId = latestArtistRequestedId;
-      artistData[artistId].lastListenerCount = latestListenerCount;
+      (int256 latestListenerCount, int256 diffListenerCount) = abi.decode(response, (int256, int256));
+
+      if (diffListenerCount <= 0) {
+        // No payments due.
+        return;
+      }
 
       // Pay the artist at 'artistData[latestArtistRequestedId].walletAddress'.
-      // uint256 amountDue = // TODO (increase in listener count / 1000 * Token Awarded Per 1000)
+      uint8 stcDecimals = IStableCoin(s_stc).decimals();
+      // Artist gets 1 STC per  10000 additional streams.
+      uint256 amountDue = (uint256(diffListenerCount) * 1 * 10 ** stcDecimals) / 10000;
 
-      // artistData[artistId].lastPaidAmount = amountDue // TODO
-      // artistData[artistId].totalPaid += amountDue // TODO
+      console.log("\nAmount Due To Artist: ", amountDue);
+
+      payArtist(artistId, amountDue);
+
+      // Update Artist Mapping.
+      artistData[artistId].lastListenerCount = uint256(latestListenerCount);
+      artistData[artistId].lastPaidAmount = amountDue;
+      artistData[artistId].totalPaid += amountDue;
     }
   }
 
@@ -130,27 +151,31 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     artistData[artistId].walletAddress = walletAddress;
   }
 
+  // TODO @Zubin make internal
+  function payArtist(string memory artistId, uint256 amountDue) public {
+    IStableCoin token = IStableCoin(s_stc);
+    if (artistData[artistId].walletAddress == address(0)) {
+      revert RecordLabel_ArtistPaymentError(artistId, amountDue, "Artist has no wallet associated.");
+    }
+
+    token.transferFrom(owner(), artistData[artistId].walletAddress, amountDue);
+    emit ArtistPaid(artistId, amountDue);
+  }
+
+  function getArtistData(string memory artistId) public view returns (Artist memory) {
+    return artistData[artistId];
+  }
+
   // Utility Functions
   function updateOracleAddress(address oracle) public onlyOwner {
     setOracle(oracle);
   }
 
+  function updateStableCoinAddress(address stc) public onlyOwner {
+    s_stc = stc;
+  }
+
   function addSimulatedRequestId(address oracleAddress, bytes32 requestId) public onlyOwner {
     addExternalRequest(oracleAddress, requestId);
-  }
-
-  function getContractBalance() public view returns (uint256) {
-    return address(this).balance;
-  }
-
-  /**
-   * @notice Contract Owner can withdraw LINK held in the contract.
-   * @param _tokenContract - The LINK token contract for this network.
-   */
-  function withdrawLinkBalance(address _tokenContract) public payable onlyOwner {
-    LinkTokenInterface LinkContract = LinkTokenInterface(_tokenContract);
-
-    bool ok = LinkContract.transfer(msg.sender, LinkContract.balanceOf(address(this)));
-    require(ok, "Failed to withdraw Link");
   }
 }

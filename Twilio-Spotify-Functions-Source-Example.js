@@ -4,7 +4,7 @@
 // Arguments can be provided when a request is initated on-chain and used in the request source code as shown below
 const artistId = args[0]
 const artistName = args[1]
-const lastListenerCount = args[2]
+const lastListenerCount = parseInt(args[2])
 const artistEmail = args[3]
 
 // Ref: https://doc.api.soundcharts.com/api/v2/doc/reference/path/artist/get-latest-spotify-monthly-listeners
@@ -19,10 +19,15 @@ if (isNaN(lastListenerCount)) {
 }
 
 const latestListenerCount = await getLatestMonthlyListenerCount()
+const diffListenerCount = latestListenerCount - lastListenerCount
 
 if (latestListenerCount > lastListenerCount) {
-  console.log(`\nArist is due payments for an additional ${newListenerCount - lastListenerCount} listeners...`)
-  await sendEmail(newListenerCount)
+  const amountDue = diffListenerCount / 10_000 // Artist gets 1 STC per 10_000 additional streams.
+  console.log(
+    `\nArist is due payments of ${amountDue} STC for an additional ${diffListenerCount.toLocaleString()} listeners...`
+  )
+
+  await sendEmail(latestListenerCount, amountDue)
 } else {
   console.log("\nArist is not due additional payments...")
 }
@@ -33,7 +38,8 @@ if (latestListenerCount > lastListenerCount) {
 // - Functions.encodeInt256
 // - Functions.encodeString
 // Or return a custom Buffer for a custom byte encoding
-return Functions.encodeUint256(latestListenerCount)
+
+return Buffer.concat([Functions.encodeInt256(latestListenerCount), Functions.encodeInt256(diffListenerCount)])
 
 // ====================
 // Helper Functions
@@ -66,9 +72,9 @@ async function getLatestMonthlyListenerCount() {
 
   newListenerCount = soundchartsResponse.data.items[0].value
   console.log(
-    `\nNew Listener Count: ${newListenerCount}. Last Listener Count: ${lastListenerCount}. Diff: ${
+    `\nNew Listener Count: ${newListenerCount.toLocaleString()}. Last Listener Count: ${lastListenerCount.toLocaleString()}. Diff: ${(
       newListenerCount - lastListenerCount
-    }.`
+    ).toLocaleString()}.`
   )
 
   return newListenerCount
@@ -76,7 +82,7 @@ async function getLatestMonthlyListenerCount() {
 
 // Uses Twilio Sendgrid API to send emails.
 // https://sendgrid.com/solutions/email-api
-async function sendEmail(latestListenerCount) {
+async function sendEmail(latestListenerCount, amountDue) {
   if (!secrets.twilioApiKey) {
     return
   }
@@ -107,10 +113,11 @@ async function sendEmail(latestListenerCount) {
         type: "text/plain",
         value: `Hey ${artistName}! 
 
-You've got ${latestListenerCount} listeners which is ${
+You've got ${latestListenerCount.toLocaleString()} listeners which is ${(
           latestListenerCount - lastListenerCount
-        } more than when we last checked!
-So you can expect some a payment to be sent to your wallet soon!
+        ).toLocaleString()} more than when we last checked!
+        
+So you can expect to be paid ${amountDue} STC to your wallet soon!
 
 Best,
 TwiLink Records
