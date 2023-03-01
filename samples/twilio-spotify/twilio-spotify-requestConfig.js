@@ -20,7 +20,7 @@ const requestConfig = {
   // args (string only array) can be accessed within the source code with `args[index]` (ie: args[0]).
   // artistID is the externally supplied Arg. Artist details are stored on contract.
   // args in sequence are: ArtistID, artistname,  lastListenerCount, artist email
-  args: ["ca22091a-3c00-11e9-974f-549f35141000", "Tones&I", "14000000", process.env.ARTIST_EMAIL], // TONES_AND_I, 14 million 
+  args: ["ca22091a-3c00-11e9-974f-549f35141000", "Tones&I", "14000000", process.env.ARTIST_EMAIL, process.env.VERIFIED_SENDER], // TONES_AND_I, 14 million 
   // expected type of the returned value
   expectedReturnType: ReturnType.int256,
   // Redundant URLs which point to encrypted off-chain secrets

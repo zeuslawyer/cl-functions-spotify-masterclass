@@ -27,9 +27,9 @@ const {
       console.log("\n__Compiling Contracts__")
       await run("compile")
   
-      // deploy StableCoin
+      // deploy SimpleStableCoin
       console.log("\n__Deploying Demo Stable Coin__")
-      const stableCoinFactory = await ethers.getContractFactory("SimpleSTC")
+      const stableCoinFactory = await ethers.getContractFactory("SimpleStableCoin")
       const stableCoinContract = await stableCoinFactory.deploy()
       await stableCoinContract.deployTransaction.wait(1)
   
@@ -37,19 +37,20 @@ const {
       const { oracle, registry, linkToken } = await deployMockOracle()
   
       // Deploy the client contract
-      const clientFactory = await ethers.getContractFactory("RecordLabel")
-      const client = await clientFactory.deploy(oracle.address, stableCoinContract.address)
-      await client.deployTransaction.wait(1)
+      const clientContractFactory = await ethers.getContractFactory("RecordLabel")
+      const clientContract = await clientContractFactory.deploy(oracle.address, stableCoinContract.address)
+      await clientContract.deployTransaction.wait(1)
   
       const accounts = await ethers.getSigners()
       const deployer = accounts[0]
+
       // Add the wallet initiating the request to the oracle allowlist
       const allowlistTx = await oracle.addAuthorizedSenders([deployer.address])
       await allowlistTx.wait(1)
   
       //  Approve RecordLabel as spender of the tokens belonging to the deployer of the Demo Stable Coin
       const deployerTokenBalance = await stableCoinContract.balanceOf(deployer.address)
-      const payer = client.address
+      const payer = clientContract.address
       await stableCoinContract.approve(payer, deployerTokenBalance)
   
       // Create & fund a subscription
@@ -63,7 +64,7 @@ const {
         ethers.utils.defaultAbiCoder.encode(["uint64"], [subscriptionId])
       )
       // Authorize the client contract to use the subscription
-      await registry.addConsumer(subscriptionId, client.address)
+      await registry.addConsumer(subscriptionId, clientContract.address)
   
       // Build the parameters to make a request from the client contract
       const requestConfig = require("../../Functions-request-config.js")
@@ -83,7 +84,7 @@ const {
       const artistCurrentBalance = await stableCoinContract.balanceOf(artistAddress)
   
       try {
-        const setArtistDataTx = await client.setArtistData(
+        const setArtistDataTx = await clientContract.setArtistData(
           artistId,
           requestConfig.args[1], // Artist Name
           requestConfig.args[3], // Artist email
@@ -100,12 +101,10 @@ const {
         throw error
       }
   
-      const artist = await client.getArtistData(requestConfig.args[0])
-  
+      
       // Make a request & simulate a fulfillment
       await new Promise(async (resolve) => {
         // Initiate the request from the client contract
-        const clientContract = await clientFactory.attach(client.address)
         const requestTx = await clientContract.executeRequest(
           request.source,
           request.secrets ?? [],
@@ -171,7 +170,7 @@ const {
         }
   
         // Listen for the ArtistPaid event & log the simulated response returned to the client contract
-        client.on("ArtistPaid", async (artistId, amountDue) => {
+        clientContract.on("ArtistPaid", async (artistId, amountDue) => {
           console.log("\n__Simulated On-Chain Response - Artist Paid__")
           if (artistId !== requestConfig.args[0]) {
             throw new Error(`ArtistIds don\'t match ${requestConfig.args[0]} is not equal to ${artistId}`)
@@ -180,7 +179,6 @@ const {
           if (amountDue.toString()) {
             console.log(`\nArtist was paid ${amountDue / 1e18} STC`)
           }
-          const artist = await client.getArtistData(requestConfig.args[0])
           const artistNewBalance = await stableCoinContract.balanceOf(artistAddress)
           console.log(
             `\nArtist ${artistId}'s balance has been updated from ${artistCurrentBalance} to ${artistNewBalance}`
@@ -188,7 +186,7 @@ const {
         })
   
         // Listen for the OCRResponse event & log the simulated response returned to the client contract
-        client.on("OCRResponse", async (eventRequestId, result, err) => {
+        clientContract.on("OCRResponse", async (eventRequestId, result, err) => {
           console.log("__Simulated On-Chain Response__")
           if (eventRequestId !== requestId) {
             throw new Error(`${eventRequestId} is not equal to ${requestId}`)

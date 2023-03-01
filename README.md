@@ -12,9 +12,9 @@ The smart contract can then calculate how much payment to send to the artist (th
 Chainlink Functions allows users to request data from almost any API and perform custom computation using JavaScript. This project is currently in a closed beta. Request access to use Chainlink Functions at https://functions.chain.link
 
 
-## Requirements
+If the artist has acquired new streams since last measured, the Chainlink Functions code will use the Twilio-Sendgrid email API to send the artist an email informing them that some payments are coming their way.  
 
-- Node.js version [18](https://nodejs.org/en/download/)
+<img width="540" alt="Messenger" src="https://user-images.githubusercontent.com/8016129/222272480-cd09893b-00f5-4104-82f6-3eef34b063d6.png"> <span /><span />
 
 ## Instructions to run this sample
 
@@ -28,7 +28,8 @@ Chainlink Functions allows users to request data from almost any API and perform
       - *MUMBAI_RPC_URL* or *SEPOLIA_RPC_URL* for the network that you intend to use
    2. If desired, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* can be set in order to verify contracts, along with any values used in the *secrets* object in *Functions-request-config.js* such as *COINMARKETCAP_API_KEY*.<br><br> You will also need the following additional Environment Variables (please refer to the `.env.example` file). The only ones you need to update for now are the first two.
         
-        ARTIST_EMAIL="YOU_CAN_PUT_YOUR_EMAIL_HERE" 
+        ARTIST_EMAIL="YOU_CAN_PUT_YOUR_EMAIL_HERE"
+        VERIFIED_SENDER="TWILIO VERIFIED SENDER EMAIL"  
         TWILIO_API_KEY="YOUR TWILIO API KEY"
         SOUNDCHART_APP_ID="soundcharts"
         SOUNDCHART_API_KEY="soundcharts"
@@ -41,108 +42,103 @@ Chainlink Functions allows users to request data from almost any API and perform
 10. Make an on-chain request by running:<br>`npx hardhat functions-request --network network_name_here --contract 0xDeployed_client_contract_address_here --subid subscription_id_number_here`, replacing subscription_id_number_here with the subscription ID you received from the previous step
 11. Read the result in the on-chain smart contract by running :<br>`npx hardhat functions-read --contract 0xDeployed_client_contract_address_here`<br>
 
+The smart contract can then calculate how much payment to send to the artist (the payment could be in the form of a stablecoin such as USDC). The record label and the artist have an agreed payment rate:  for example, the artist gets 1 USDC for every 10000 additional streams for every 1000 additional steams.  This rate is part of the smart contract's code and represents a trust-minimized, verifiable, on-chain record of the agreement. 
 
-# Command Glossary
 
-Each of these commands can be executed in the following format:
-`npx hardhat command_here --parameter1 parameter_1_value_here --parameter2 parameter_2_value_here`
+## Functions CLI Tool
+This sample uses the tooling in [this repo](https://github.com/smartcontractkit/functions-hardhat-starter-kit).  To get a full list of commands available using the Chainlink Functions CLI tool please visit the README on that repo.
 
-Example: `npx hardhat functions-read --network mumbai --contract 0x787Fe00416140b37B026f3605c6C72d096110Bb8`
 
-### Functions Commands
+## Before you Start...
+### Setup
 
-| Command                            | Description                                                                                                                      | Parameters                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `compile`                          | Compiles all smart contracts                                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `functions-simulate`               | Simulates an end-to-end fulfillment locally for the *FunctionsConsumer* contract                                                 | `gaslimit` (optional): Maximum amount of gas that can be used to call *fulfillRequest* in the client contract (defaults to 100,000 & must be less than 300,000)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `functions-deploy-client`          | Deploys the *FunctionsConsumer* contract                                                                                         | `network`: Name of blockchain network, `verify` (optional): Set to `true` to verify the deployed *FunctionsConsumer* contract (defaults to `false`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `functions-request`                | Initiates a request from a *FunctionsConsumer* client contract using data from *Functions-request-config.js*                     | `network`: Name of blockchain network, `contract`: Address of the client contract to call, `subid`: Billing subscription ID used to pay for the request, `gaslimit` (optional): Maximum amount of gas that can be used to call *fulfillRequest* in the client contract (defaults to 100,000 & must be less than 300,000), `requestgas` (optional): Gas limit for calling the *executeRequest* function (defaults to 1,500,000), `simulate` (optional): Flag indicating if simulation should be run before making an on-chain request (defaults to true)                                                              |
-| `functions-read`                   | Reads the latest response (or error) returned to a *FunctionsConsumer* or *AutomatedFunctionsConsumer* client contract           | `network`: Name of blockchain network, `contract`: Address of the client contract to read                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `functions-deploy-auto-client`     | Deploys the *AutomatedFunctionsConsumer* contract and sets the Functions request using data from *Functions-request-config.js*   | `network`: Name of blockchain network, `subid`: Billing subscription ID used to pay for Functions requests, `gaslimit` (optional): Maximum amount of gas that can be used to call *fulfillRequest* in the client contract (defaults to 250000), `interval` (optional): Update interval in seconds for Chainlink Automation to call *performUpkeep* (defaults to 300), `verify` (optional): Set to `true` to verify the deployed *AutomatedFunctionsConsumer* contract (defaults to `false`), `simulate` (optional): Flag indicating if simulation should be run before making an on-chain request (defaults to true) |
-| `functions-check-upkeep`           | Checks if *checkUpkeep* returns true for an Automation compatible contract                                                       | `network`: Name of blockchain network, `contract`: Address of the contract to check, `data` (optional): Hex string representing bytes that are passed to the *checkUpkeep* function (defaults to empty bytes)                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `functions-perform-upkeep`         | Manually call *performUpkeep* in an Automation compatible contract                                                               | `network`: Name of blockchain network, `contract`: Address of the contract to call, `data` (optional): Hex string representing bytes that are passed to the *performUpkeep* function (defaults to empty bytes)                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `functions-set-auto-request`       | Updates the Functions request in deployed *AutomatedFunctionsConsumer* contract using data from *Functions-request-config.js*    | `network`: Name of blockchain network, `contract`: Address of the contract to update, `subid`: Billing subscription ID used to pay for Functions requests, `interval` (optional): Update interval in seconds for Chainlink Automation to call *performUpkeep* (defaults to 300), `gaslimit` (optional): Maximum amount of gas that can be used to call *fulfillRequest* in the client contract (defaults to 250,000)                                                                                                                                                                                                 |
-| `functions-set-oracle-addr`        | Updates the oracle address for a client contract using the *FunctionsOracle* address from *network-config.js*                    | `network`: Name of blockchain network, `contract`: Address of the client contract to update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `functions-build-request`          | Creates a JSON file with Functions request parameters including encrypted secrets, using data from *Functions-request-config.js* | `network`: Name of blockchain network, `output` (optional): Output JSON file name (defaults to *Functions-request.json*), `simulate` (optional): Flag indicating if simulation should be run before building the request JSON file (defaults to true)                                                                                                                                                                                                                                                                                                                                                                |
-| `functions-build-offchain-secrets` | Builds an off-chain secrets object that can be uploaded and referenced via URL                                                   | `network`: Name of blockchain network, `output` (optional): Output JSON file name (defaults to *offchain-secrets.json*)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+1. Get your Twilio Sendgrid API Keys by following [these docs](https://docs.sendgrid.com/for-developers/sending-email/api-getting-started). <b> You cannot use this sample without completing the Sendgrid setup steps!</b>
 
-### Functions Subscription Management Commands
+2. Ensure you follow the [verify process](https://docs.sendgrid.com/ui/sending-email/sender-verification) for the email address that you intend to send from. Sendgrid needs to approve it.
 
-| Command                      | Description                                                                                                                              | Parameters                                                                                                                                                                                                                 |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `functions-sub-create`       | Creates a new Functions billing subscription for Functions client contracts                                                              | `network`: Name of blockchain network, `amount` (optional): Initial amount used to fund the subscription in LINK (decimals are accepted), `contract` (optional): Address of the client contract to add to the subscription |
-| `functions-sub-info`         | Gets the Functions billing subscription balance, owner, and list of authorized client contract addresses                                 | `network`: Name of blockchain network, `subid`: Subscription ID                                                                                                                                                            |
-| `functions-sub-fund`         | Funds a Functions billing subscription with LINK                                                                                         | `network`: Name of blockchain network, `subid`: Subscription ID, `amount`: Amount to fund subscription in LINK (decimals are accepted)                                                                                     |
-| `functions-sub-cancel`       | Cancels a Functions billing subscription and refunds the unused balance. Cancellation is only possible if there are no pending requests. | `network`: Name of blockchain network, `subid`: Subscription ID, `refundaddress` (optional): Address where the remaining subscription balance is sent (defaults to caller's address)                                       |
-| `functions-sub-add`          | Authorizes a client contract to use the Functions billing subscription                                                                   | `network`: Name of blockchain network, `subid`: Subscription ID, `contract`: Address of the client contract to authorize for billing                                                                                       |
-| `functions-sub-remove`       | Removes a client contract from a Functions billing subscription                                                                          | `network`: Name of blockchain network, `subid`: Subscription ID, `contract`: Address of the client contract to remove from billing subscription                                                                            |
-| `functions-sub-transfer`     | Request ownership of a Functions subscription be transferred to a new address                                                            | `network`: Name of blockchain network, `subid`: Subscription ID, `newowner`: Address of the new owner                                                                                                                      |
-| `functions-sub-accept`       | Accepts ownership of a Functions subscription after a transfer is requested                                                              | `network`: Name of blockchain network, `subid`: Subscription ID                                                                                                                                                            |
-| `functions-timeout-requests` | Times out expired requests                                                                                                               | `network`: Name of blockchain network, `requestids`: 1 or more request IDs to timeout separated by commas                                                                                                                  |
+3. Take a look at the [soundcharts sandbox api](https://doc.api.soundcharts.com/api/v2/doc). Note that the sandbox's API credentials are public for a very limited data set. It's enough for this sample.
 
-# Request Configuration
+4. Get your RPC URL with API key for Sepolia or Mumbai - from [Infura](https://infura.io) or [Alchemy](https://alchemy.com).
 
-Chainlink Functions requests can be configured by modifying values in the `requestConfig` object found in the *Functions-request-config.js* file located in the root of this repository.
+5. Get your network's token (Sepolia Eth ) or [Mumbai Matic](https://faucet.polygon.technology/) and, after connecting your Metamask wallet to the right testnet, get some LINK token(faucets.link.com) into your Metamask or other browser wallet.
 
-| Setting Name             | Description                                                                                                                                                                                                                                                                                                                 |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `codeLocation`           | This specifies where the JavaScript code for a request is located. Currently, only the `Location.Inline` option is supported (represented by the value `0`). This means the JavaScript string is provided directly in the on-chain request instead of being referenced via a URL.                                           |
-| `secretsLocation`        | This specifies where the encrypted secrets for a request are located. `Location.Inline` (represented by the value `0`) means encrypted secrets are provided directly on-chain, while `Location.Remote` (represented by `1`) means secrets are referenced via encrypted URLs.                                                |
-| `codeLanguage`           | This specifies the language of the source code which is executed in a request. Currently, only `JavaScript` is supported (represented by the value `0`).                                                                                                                                                                    |
-| `source`                 | This is a string containing the source code which is executed in a request. This must be valid JavaScript code that returns a Buffer. See the [JavaScript Code](#javascript-code) section for more details.                                                                                                                 |
-| `secrets`                | This is a JavaScript object which contains secret values that are injected into the JavaScript source code and can be accessed using the name `secrets`. This object will be automatically encrypted by the tooling using the DON public key before making an on-chain request. This object can only contain string values. |
-| `walletPrivateKey`       | This is the EVM private key. It is used to generate a signature for the encrypted secrets such that the secrets cannot be reused by an unauthorized 3rd party.                                                                                                                                                              |
-| `args`                   | This is an array of strings which contains values that are injected into the JavaScript source code and can be accessed using the name `args`. This provides a convenient way to set modifiable parameters within a request.                                                                                                |
-| `expectedReturnType`     | This specifies the expected return type of a request. It has no on-chain impact, but is used by the CLI to decode the response bytes into the specified type. The options are `uint256`, `int256`, `string`, or `Buffer`.                                                                                                   |
-| `secretsURLs`            | This is an array of URLs where encrypted off-chain secrets can be fetched when a request is executed if `secretsLocation` == `Location.Remote`. This array is converted into a space-separated string, encrypted using the DON public key, and used as the `secrets` parameter on-chain.                                    |
-| `perNodeOffchainSecrets` | This is an array of `secrets` objects that enables the optional ability to assign a separate set of secrets for each node in the DON if `secretsLocation` == `Location.Remote`. It is used by the `functions-build-offchain-secret` command. See the [Off-chain Secrets](#off-chain-secrets) section for more details.      |
-| `globalOffchainSecrets`  | This is a default `secrets` object that can be used by DON members to process a request. It is used by the `functions-build-offchain-secret` command. See the [Off-chain Secrets](#off-chain-secrets) section for more details.                                                                                             |
+6. Make sure you have your testnet node RPC URLs in the `./env` file. If necessary, use infura.io or alchemy.com to get your testnet node RPC URL.
 
-## JavaScript Code
+7. Create a `.env` file in the project's root (please refer to the `.env.example` file):.  Make sure you have at least the following:
 
-The JavaScript source code for a Functions request can use vanilla Node.js features, but *cannot* use any `require` statements or imported modules other than the built-in modules `buffer`, `crypto`, `querystring`, `string_decoder`, `url`, and `util`.
+      > :warning: DO NOT COMMIT YOUR .env FILE! The .gitignore file excludes .env but NOT .env.example
+        
+        ARTIST_EMAIL="PRETEND_YOUR_EMAIL_IS_THE_ARTISTS" 
+        VERIFIED_SENDER="THE_EMAIL_VERIFIED_BY_TWILIO" 
+        
+        TWILIO_API_KEY="YOUR TWILIO API KEY"
+        SOUNDCHART_APP_ID="soundcharts"
+        SOUNDCHART_API_KEY="soundcharts"
 
-It must return a JavaScript Buffer which represents the response bytes that are sent back to the requesting contract.
-Encoding functions are provided in the [Functions library](#functions-library).
-Additionally, the script must return in **less than 10 seconds** or it will be terminated and send back an error to the requesting contract.
 
-In order to make HTTP requests, the source code must use the `Functions.makeHttpRequest` function from the exposed [Functions library](#functions-library).
-Asynchronous code with top-level `await` statements is supported, as shown in the file *API-request-example.js*.
+        MUMBAI_RPC_URL="https://polygon-mumbai.g.alchemy.com/v2/ExampleKey"  # OR
+        SEPOLIA_RPC_URL="https://sepolia.infura.io/v3/ExampleKey"  
+        
+        # and
+        PRIVATE_KEY="EVM wallet private key (Example: 6c0d*********************************************ac8da9)"
 
-### Functions Library
+        SECOND_PRIVATE_KEY="SECONDWALLET KEY HERE"
 
-The `Functions` library is injected into the JavaScript source code and can be accessed using the name `Functions`.
-
-In order to make HTTP requests, only the `Functions.makeHttpRequest` function can be used. All other methods of accessing the Internet are restricted.
-The function takes an object with the following parameters.
+8. Update the `../../hardhat.config.js` in the project's root file to include your private keys for a second wallet account We will pretend this is the artist's wallet address.
 
 ```
-{
-  url: String with the URL to which the request is sent,
-  method (optional): String specifying the HTTP method to use which can be either 'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', or 'OPTIONS' (defaults to 'GET'),
-  headers (optional): Object with headers to use in the request,
-  params (optional): Object with URL query parameters,
-  data (optional): Object which represents the body sent with the request,
-  timeout (optional): Number with the maximum request duration in ms (defaults to 5000 ms),
-  responseType (optional): String specifying the expected response type which can be either 'json', 'arraybuffer', 'document', 'text' or 'stream' (defaults to 'json'),
-}
+accounts: process.env.PRIVATE_KEY
+        ? [
+            {
+              privateKey: process.env.PRIVATE_KEY,
+              balance: "10000000000000000000000",
+            },
+// Add this....
+            {
+              privateKey: process.env.SECOND_PRIVATE_KEY,
+              balance: "10000000000000000000000",
+            },
+          ]
+        : [],
 ```
 
-The function returns a promise that resolves to either a success response object or an error response object.
 
-A success response object will have the following parameters.
+9. Study the file `./samples/twilio-spotify/Twilio-Spotify-Functions-Source-Example.js`. 
 
+4. Study the `RecordLabel` contract in `../../contracts/sample-apps/RecordLabel.sol` which makes the request and receives the results sent by the Functions source code example. The request is initiated via `executeRequest()` and the DON will return the output of your custom code in the `fulfillRequest()` callback.  
+
+5. Copy the value of the variable `requestConfig` in `./samples/twilio-spotify/twilio-spotify-requestConfig.js`. Paste/replace that object as the new value of `requestConfig` in `../../Functions-request-config.js`.  Note that this example uses Off Chain Secrets.  Follow the instructions in [the upstream README](https://github.com/smartcontractkit/functions-hardhat-starter-kit#off-chain-secrets) on how to use Off Chain Secrets.
+
+
+
+
+### Executing your Chainlink Functions Custom Code via CLI commands
+
+1. All commands are documented in the [upstream repo's command glossary](https://github.com/smartcontractkit/functions-hardhat-starter-kit#command-glossary). We will run through the main commands here. Note that for this twilio-spotify example, the tasks are custom made in the `tasks/Sample-apps-tasks` folder. 
+
+2.  > :warning: **Update the Functions Consumer Contract in code**:When you're ready to run the CLI scripts described in the main README file, make sure you update the references to the client smart contract correctly. 
+
+    When running the CLI commands (which are Hardhat [tasks](https://hardhat.org/hardhat-runner/docs/guides/tasks-and-scripts)), be sure to find the script that implements the task in `/tasks` directory, and change the Contract name in the line that looks like this `const clientFactory = await ethers.getContractFactory("FunctionsConsumer")`. In the Twilio-spotify sample, the contract in this line will read as `const clientFactory = await ethers.getContractFactory("RecordLabel")`.  Replace all references to `await ethers.getContractFactory("FunctionsConsumer")`  in `./tasks/...` to `await ethers.getContractFactory("RecordLabel")`.
+
+
+3. First deploy the SimpleStableCoin contract to the testnet of your choice
+`npx hardhat functions-deploy-stablecoin --network <<network name>>`
+
+4. Then deploy the RecordLabel Smart Contract (referred to as "FunctionsConsumer")
+` npx hardhat functions-deploy-recordlabel --network <<network name>> --stc-contract <<address of the SimpleStableCoin contract>>`
+
+5. Create a Chainlink subscription, fund it with LINK (decimals accepted), and add your RecordLabel contract as an authorized consumer / client of Chainlink Functions services.
+`npx hardhat functions-sub-create --network <<network name>> --amount 2.5 --contract <<0x-RecordLabel-address>>`
+    This will print out information on the subscription ID created, and the details of your LINK balance and which contracts are authorised consumers.
+
+
+// TODO :Zubin remove this below
 ```
-{
-  error: false,
-  data: Response data sent by the server,
-  status: Number representing the response status,
-  statusText: String representing the response status,
-  headers: Object with response headers sent by the server,
-}
-```
+npx hardhat functions-simulate-twilio --gaslimit 300000 // set the max gas limit to run the computations in the RecorLabel's fulfillRequest() method
 
-An error response object will have the following parameters.
+// When ready to deploy to testnets, first deploy the mock stablecoin SimpleStableCoin ERC20 contract
+yhh function-deploy-stablecoin --network <<network name>>
+
 
 ```
 {
@@ -201,3 +197,24 @@ For debugging, use the command `npx hardhat functions-check-upkeep --network net
 To manually trigger a request, use the command `npx hardhat functions-perform-upkeep --network network_name_here --contract contract_address_here`.
 
 
+# Sample Apps
+
+> :warning: **Functions is in Beta**: Some of these use cases are solely to educate developers on functionality, current and proposed, in the rollout of Chainlink Functions. While several of these sample apps demonstrate posting data to external APIs, this functionality is under active development and is not yet recommended for production use. 
+
+*Notes to Repo Developers*:
+- Currently, we follow this [workflow for forks & syncing](https://www.atlassian.com/git/tutorials/git-forks-and-upstreams). These instructions use the same terminology from that article regarding "origin" and "upstream" repos. Please add the `upstream` repo as indicated in the article.
+- Please make sure the `main` branch of this repo is synced to `main` of its [upstream repo](https://github.com/smartcontractkit/functions-hardhat-starter-kit) before pulling and adding any code.
+- once you have synced to `main` of upstream, create  a new local branch on your machine with `git checkout -b <<YOUR DEV BRANCH NAME>>`
+- As you develop locally, the `main` branch in the upstream may progress, so make sure you sync this fork via the Github UI and the `git pull` into your `main` branch. To get those changes patched into your dev branch, change to your dev branch and then run `git rebase main`.  This will apply all your changes "on top of" the latest syncs.
+- Ideally do not push your dev branch to this repo until you're ready to submit a PR. Complete your development, and rebase your dev branch onto `main` before you push and request a PR   :warning: **If you have already pushed and have more changes your local branch and the remove will have a "has diverged" error.** You may need to follow the `git merge` workflow referred to in article mentioned above, to resolve conflicts.
+- All sample app use case code goes into the `/samples`directory. Take a look at `/samples/twilio-spotify` to see how to write a sample app.
+- Please add sample-specific instructions to a separate README inside your sample app directory.  For example `./samples/twilio-spotify/README.md`
+- when submitting a PR for approval :warning: **make sure you set the base repo to this samples repo and NOT the upstream. Make sure you set the base branch as `main`**
+
+### How to run a sample app
+
+When running a sample app: 
+- Take a look at the README file inside the sample app's directory in the `./samples/...` path.
+- always make sure you comment out the existing `requestConfig` object in the `./Functions-request-config.js` file 
+- Replace it with a correctly set up request configuration object that is specific to your app.  For example, for the twilio-spotify example, the config object for that use case is specified in `./samples/twilio-spotify/twilio-spotify-requestConfig.js`. That object is copied and pasted into `./Functions-request-config.js` to replace the default object.
+- when running the CLI commands (which are Hardhat [tasks](https://hardhat.org/hardhat-runner/docs/guides/tasks-and-scripts)), be sure to find the script that implements the task in `/tasks` directory, and change the Contract name in the line that looks like this `const clientFactory = await ethers.getContractFactory("FunctionsConsumer")`. In the Twilio-spotify sample, the contract in this line will read as `const clientFactory = await ethers.getContractFactory("RecordLabel")`

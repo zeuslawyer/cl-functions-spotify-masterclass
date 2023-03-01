@@ -6,6 +6,7 @@ const artistId = args[0]
 const artistName = args[1]
 const lastListenerCount = parseInt(args[2])
 const artistEmail = args[3]
+const VERIFIED_SENDER = args[4]
 
 // Ref: https://doc.api.soundcharts.com/api/v2/doc/reference/path/artist/get-latest-spotify-monthly-listeners
 const URL = `https://sandbox.api.soundcharts.com/api/v2/artist/${artistId}/streaming/spotify/listeners`
@@ -89,10 +90,9 @@ async function sendEmail(latestListenerCount, amountDue) {
 
   const sendgridURL = "https://api.sendgrid.com/v3/mail/send"
   // Use the verified sender email address
-  const VERIFIED_SENDER = "VERIFIED_EMAIL_HERE" // TODO Put your Sendgrid Twilio-verified sender email address here.
   const authHeader = "Bearer " + secrets.twilioApiKey
 
-  if (!VERIFIED_SENDER || VERIFIED_SENDER === "VERIFIED_EMAIL_HERE") throw new Error("VERIFIED_SENDER constant not set")
+  if (!VERIFIED_SENDER) throw new Error("VERIFIED_SENDER constant not set")
 
   // Structure for POSTING email data to Sendgrid.
   // Reference: https://docs.sendgrid.com/api-reference/mail-send/mail-send

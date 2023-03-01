@@ -30,7 +30,7 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
   bytes public latestError;
   string public latestArtistRequestedId;
 
-  address public s_stc; // StableCoin address for payouts.
+  address public s_stc; // SimpleStableCoin address for payouts.
 
   error RecordLabel_ArtistPaymentError(string artistId, uint256 payment, string errorMsg);
 

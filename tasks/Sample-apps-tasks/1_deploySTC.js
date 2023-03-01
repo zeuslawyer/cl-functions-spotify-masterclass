@@ -1,7 +1,7 @@
 const { types } = require("hardhat/config")
 const { VERIFICATION_BLOCK_CONFIRMATIONS, networkConfig } = require("../../network-config")
 
-task("samples-deploy-stablecoin", "Deploys the StableCoin contract for Twilio-Spotify sample")
+task("functions-deploy-stablecoin", "Deploys the SimpleStableCoin contract for Twilio-Spotify sample")
   .addOptionalParam("verify", "Set to true to verify client contract", false, types.boolean)
   .setAction(async (taskArgs) => {
     if (network.name === "hardhat") {
@@ -10,12 +10,12 @@ task("samples-deploy-stablecoin", "Deploys the StableCoin contract for Twilio-Sp
       )
     }
 
-    console.log(`Deploying StableCoin contract to ${network.name}`)
+    console.log(`Deploying SimpleStableCoin contract to ${network.name}`)
 
     console.log("\n__Compiling Contracts__")
     await run("compile")
 
-    const stcContractFactory = await ethers.getContractFactory("StableCoin")
+    const stcContractFactory = await ethers.getContractFactory("SimpleStableCoin")
 
     const stcContract = await stcContractFactory.deploy()
 

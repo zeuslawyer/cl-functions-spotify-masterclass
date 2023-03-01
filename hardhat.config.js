@@ -87,18 +87,19 @@ module.exports = {
         enabled: true,
       },
       chainId: 31337,
-      accounts: process.env.PRIVATE_KEY
-        ? [
-            {
-              privateKey: process.env.PRIVATE_KEY,
-              balance: "10000000000000000000000",
-            },
-            {
-              privateKey: process.env.SECOND_PRIVATE_KEY,
-              balance: "10000000000000000000000",
-            },
-          ]
-        : [],
+      accounts:
+        process.env.PRIVATE_KEY && process.env.SECOND_PRIVATE_KEY
+          ? [
+              {
+                privateKey: process.env.PRIVATE_KEY,
+                balance: "10000000000000000000000",
+              },
+              {
+                privateKey: process.env.SECOND_PRIVATE_KEY,
+                balance: "20000000000000000000000",
+              },
+            ]
+          : [],
     },
     mainnet: {
       url: MAINNET_RPC_URL ?? "UNSET",
@@ -107,17 +108,24 @@ module.exports = {
     },
     polygon: {
       url: POLYGON_MAINNET_RPC_URL ?? "UNSET",
-      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       chainId: 137,
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
     mumbai: {
       url: MUMBAI_RPC_URL ?? "UNSET",
-      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      // accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      accounts:
+        process.env.PRIVATE_KEY && process.env.SECOND_PRIVATE_KEY
+          ? [process.env.PRIVATE_KEY, process.env.SECOND_PRIVATE_KEY]
+          : [],
     },
     sepolia: {
       url: SEPOLIA_RPC_URL || "UNSET",
-      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       chainId: 11155111,
+      accounts:
+        process.env.PRIVATE_KEY && process.env.SECOND_PRIVATE_KEY
+          ? [process.env.PRIVATE_KEY, process.env.SECOND_PRIVATE_KEY]
+          : [],
     },
   },
   etherscan: {

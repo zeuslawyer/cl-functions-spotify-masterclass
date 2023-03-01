@@ -11,13 +11,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * @dev this will inheri the interface as describe in https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20
  * @dev 1 STC has 18 decimal places.
  */
-contract SimpleSTC is ERC20 {
+contract SimpleStableCoin is ERC20 {
     address private s_owner;
 
 
     constructor() ERC20("SimpleSTC", "STC") {
         s_owner = msg.sender;
-        _mint(msg.sender, 1000000000000000000000000);  // 1 Million STC
+        _mint(msg.sender, 1000000000000000000000000);  // 1 Million STC minted to the deployer.
     }
 
 
