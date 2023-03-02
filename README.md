@@ -1,54 +1,46 @@
-# Chainlink Functions Starter Kit
+# Chainlink Functions <>  Twilio-Spotify Sample app
 
-- [Chainlink Functions Starter Kit](#chainlink-functions-starter-kit)
-- [Overview](#overview)
-- [Quickstart](#quickstart)
-  - [Requirements](#requirements)
-  - [Steps](#steps)
-- [Command Glossary](#command-glossary)
-    - [Functions Commands](#functions-commands)
-    - [Functions Subscription Management Commands](#functions-subscription-management-commands)
-- [Request Configuration](#request-configuration)
-  - [JavaScript Code](#javascript-code)
-    - [Functions Library](#functions-library)
-  - [Modifying Contracts](#modifying-contracts)
-  - [Simulating Requests](#simulating-requests)
-  - [Off-chain Secrets](#off-chain-secrets)
-- [Automation Integration](#automation-integration)
+This use case showcases how Chainlink Functions can be used to facilitate a digital agreement between a record label and a music artist, with Chainlink Functions being used to obtain the artists streaming numbers, as well as to send them notifications as payments are made using the [Twilio SendGrid Email API](https://www.twilio.com/en-us/sendgrid/email-api) 
 
-# Overview
+The `RecordLabel` contract represents an on-chain payment contract between a music artist and the record label. Chainlink Functions is used to poll the latest monthly streaming numbers for the artist, using Soundcharts' spotify API. 
 
-<p><b>This project is currently in a closed beta. Request access to send on-chain requests here <a href="https://functions.chain.link/">https://functions.chain.link/</a></b></p>
+If the artist has acquired new streams since last measured, the Chainlink Functions code will use the Twilio-Sendgrid email API to send the artist an email informing them that some payments are coming their way.  The Functions code will also send the latest stream count back to the smart contract so it can be recorded immutably on the blockchain. The returned value is passed through [Chainlink's Off Chain Reporting consensus mechanism](https://docs.chain.link/architecture-overview/off-chain-reporting/) - which the nodes in the [Decentralized Oracle Network](https://chain.link/whitepaper) that are returning this streams data achieve a cryptographically verifiable consensus on that returned data!  
 
-<p>Chainlink Functions allows users to request data from almost any API and perform custom computation using JavaScript.</p>
-<p>It works by using a <a href="https://chain.link/education/blockchain-oracles#decentralized-oracles">decentralized oracle network</a> (DON).<br>When a request is initiated, each node in the DON executes the user-provided JavaScript code simultaneously.  Then, nodes use the <a href="https://docs.chain.link/architecture-overview/off-chain-reporting/">Chainlink OCR</a> protocol to come to consensus on the results.  Finally, the median result is returned to the requesting contract via a callback function.</p>
-<p>Chainlink Functions also enables users to share encrypted secrets with each node in the DON.  This allows users to access APIs that require authentication, without exposing their API keys to the general public.
+The smart contract can then calculate how much payment to send to the artist (the payment could be in the form of a stablecoin such as USDC). The record label and the artist have an agreed payment rate:  for example, the artist gets 1 USDC for every 10000 additional streams for every 1000 additional steams.  This rate is part of the smart contract's code and represents a trust-minimized, verifiable, on-chain record of the agreement. 
 
 
-**To learn how to use the sample apps in this repo  please scroll to the bottom of this README to the [Sample Apps](#sample-apps) section.**
+Chainlink Functions allows users to request data from almost any API and perform custom computation using JavaScript. This project is currently in a closed beta. Request access to use Chainlink Functions at https://functions.chain.link
 
-# Quickstart
 
 ## Requirements
 
 - Node.js version [18](https://nodejs.org/en/download/)
 
-## Steps
+## Instructions to run this sample
 
-1. Clone this repository to your local machine<br><br>
-2. Open this directory in your command line, then run `npm install` to install all dependencies.<br><br>
-3. Set the required environment variables.
+1. Get your Twilio Sendgrid API Keys by following [these docs](https://docs.sendgrid.com/for-developers/sending-email/api-getting-started). <b> You cannot use this sample without completing the Sendgrid setup steps!</b> Ensure you follow the verify process for the email address that you intend to send from. Sendgrid needs to approve it.
+2. Take a look at the [soundcharts sandbox api](https://doc.api.soundcharts.com/api/v2/doc). Note that the sandbox's API credentials are public for a very limited data set. It's enough for this sample.
+3. Clone this repository to your local machine<br><br>
+4. Open this directory in your command line, then run `npm install` to install all dependencies.<br><br>
+5. Set the required environment variables.
    1. This can be done by copying the file *.env.example* to a new file named *.env*. (This renaming is important so that it won't be tracked by Git.) Then, change the following values:
       - *PRIVATE_KEY* for your development wallet
       - *MUMBAI_RPC_URL* or *SEPOLIA_RPC_URL* for the network that you intend to use
-   2. If desired, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* can be set in order to verify contracts, along with any values used in the *secrets* object in *Functions-request-config.js* such as *COINMARKETCAP_API_KEY*.<br><br>
-4. There are two files to notice that the default example will use:
-   - *contracts/FunctionsConsumer.sol* contains the smart contract that will receive the data
-   - *calculation-example.js* contains JavaScript code that will be executed by each node of the DON<br><br>
-5. Test an end-to-end request and fulfillment locally by simulating it using:<br>`npx hardhat functions-simulate`<br><br>
-6. Deploy and verify the client contract to an actual blockchain network by running:<br>`npx hardhat functions-deploy-client --network network_name_here --verify true`<br>**Note**: Make sure *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* are set if using `--verify true`, depending on which network is used.<br><br>
-7. Create, fund & authorize a new Functions billing subscription by running:<br> `npx hardhat functions-sub-create --network network_name_here --amount LINK_funding_amount_here --contract 0xDeployed_client_contract_address_here`<br>**Note**: Ensure your wallet has a sufficient LINK balance before running this command.  Testnet LINK can be obtained at <a href="https://faucets.chain.link/">faucets.chain.link</a>.<br><br>
-8. Make an on-chain request by running:<br>`npx hardhat functions-request --network network_name_here --contract 0xDeployed_client_contract_address_here --subid subscription_id_number_here`
+   2. If desired, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* can be set in order to verify contracts, along with any values used in the *secrets* object in *Functions-request-config.js* such as *COINMARKETCAP_API_KEY*.<br><br> You will also need the following additional Environment Variables (please refer to the `.env.example` file). The only ones you need to update for now are the first two.
+        
+        ARTIST_EMAIL="YOU_CAN_PUT_YOUR_EMAIL_HERE" 
+        TWILIO_API_KEY="YOUR TWILIO API KEY"
+        SOUNDCHART_APP_ID="soundcharts"
+        SOUNDCHART_API_KEY="soundcharts"
+
+
+6. Study the file `./Twilio-Spotify-Functions-Source-Example.js`. Ensure you fill in the `VERIFIED_SENDER` constant with your Sendgrid Twilio-verified sender email address.  
+7. Test an end-to-end request and fulfillment locally by simulating it using:<br>`npx hardhat functions-simulate`<br><br>
+8. Deploy and verify the RecordLabel contract to an actual blockchain network by running:<br>`npx hardhat functions-deploy-client --network network_name_here --verify true`<br>**Note**: Make sure *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* are set if using `--verify true`, depending on which network is used.<br><br> Network_name_here should be replaced with the network you are deploying to (Sepolia or Mumbai) in this step, as well as all steps after this one
+9. Create, fund & authorize a new Functions billing subscription by running:<br> `npx hardhat functions-sub-create --network network_name_here --amount LINK_funding_amount_here --contract 0xDeployed_client_contract_address_here`<br>**Note**: Ensure your wallet has a sufficient LINK balance before running this command.  Testnet LINK can be obtained at <a href="https://faucets.chain.link/">faucets.chain.link</a>.<br><br> A suitable amount of LINK to fund for most requests is 0.5 - 1 LINK. You should replace 0xDeployed_client_contract_address_here with your deployed contract address from the previous step.
+10. Make an on-chain request by running:<br>`npx hardhat functions-request --network network_name_here --contract 0xDeployed_client_contract_address_here --subid subscription_id_number_here`, replacing subscription_id_number_here with the subscription ID you received from the previous step
+11. Read the result in the on-chain smart contract by running :<br>`npx hardhat functions-read --contract 0xDeployed_client_contract_address_here`<br>
+
 
 # Command Glossary
 
@@ -209,24 +201,3 @@ For debugging, use the command `npx hardhat functions-check-upkeep --network net
 To manually trigger a request, use the command `npx hardhat functions-perform-upkeep --network network_name_here --contract contract_address_here`.
 
 
-# Sample Apps
-
-> :warning: **Functions is in Beta**: Some of these use cases are solely to educate developers on functionality, current and proposed, in the rollout of Chainlink Functions. While several of these sample apps demonstrate posting data to external APIs, this functionality is under active development and is not yet recommended for production use. 
-
-*Notes to Repo Developers*:
-- Currently, we follow this [workflow for forks & syncing](https://www.atlassian.com/git/tutorials/git-forks-and-upstreams). These instructions use the same terminology from that article regarding "origin" and "upstream" repos. Please add the `upstream` repo as indicated in the article.
-- Please make sure the `main` branch of this repo is synced to `main` of its [upstream repo](https://github.com/smartcontractkit/functions-hardhat-starter-kit) before pulling and adding any code.
-- once you have synced to `main` of upstream, create  a new local branch on your machine with `git checkout -b <<YOUR DEV BRANCH NAME>>`
-- As you develop locally, the `main` branch in the upstream may progress, so make sure you sync this fork via the Github UI and the `git pull` into your `main` branch. To get those changes patched into your dev branch, change to your dev branch and then run `git rebase main`.  This will apply all your changes "on top of" the latest syncs.
-- Ideally do not push your dev branch to this repo until you're ready to submit a PR. Complete your development, and rebase your dev branch onto `main` before you push and request a PR   :warning: **If you have already pushed and have more changes your local branch and the remove will have a "has diverged" error.** You may need to follow the `git merge` workflow referred to in article mentioned above, to resolve conflicts.
-- All sample app use case code goes into the `/samples`directory. Take a look at `/samples/twilio-spotify` to see how to write a sample app.
-- Please add sample-specific instructions to a separate README inside your sample app directory.  For example `./samples/twilio-spotify/README.md`
-- when submitting a PR for approval :warning: **make sure you set the base repo to this samples repo and NOT the upstream. Make sure you set the base branch as `main`**
-
-### How to run a sample app
-
-When running a sample app: 
-- Take a look at the README file inside the sample app's directory in the `./samples/...` path.
-- always make sure you comment out the existing `requestConfig` object in the `./Functions-request-config.js` file 
-- Replace it with a correctly set up request configuration object that is specific to your app.  For example, for the twilio-spotify example, the config object for that use case is specified in `./samples/twilio-spotify/twilio-spotify-requestConfig.js`. That object is copied and pasted into `./Functions-request-config.js` to replace the default object.
-- when running the CLI commands (which are Hardhat [tasks](https://hardhat.org/hardhat-runner/docs/guides/tasks-and-scripts)), be sure to find the script that implements the task in `/tasks` directory, and change the Contract name in the line that looks like this `const clientFactory = await ethers.getContractFactory("FunctionsConsumer")`. In the Twilio-spotify sample, the contract in this line will read as `const clientFactory = await ethers.getContractFactory("RecordLabel")`

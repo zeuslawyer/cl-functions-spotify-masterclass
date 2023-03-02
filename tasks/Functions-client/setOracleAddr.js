@@ -15,7 +15,7 @@ task(
         taskArgs.contract
       } on ${network.name}`
     )
-    const clientContractFactory = await ethers.getContractFactory("FunctionsConsumer")
+    const clientContractFactory = await ethers.getContractFactory("RecordLabel")
     const clientContract = await clientContractFactory.attach(taskArgs.contract)
 
     const updateTx = await clientContract.updateOracleAddress(networkConfig[network.name]["functionsOracleProxy"])
