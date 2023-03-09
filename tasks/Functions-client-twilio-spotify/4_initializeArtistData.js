@@ -14,7 +14,7 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
     if (!ethers.utils.isAddress(recordLabelAddress))
       throw Error("Please provide a valid contract address for the SimpleStableCoin contract")
 
-    const requestConfig = require("../../Functions-request-config.js")
+    const requestConfig = require("../../Twilio-Spotify-RequestConfig.js")
     const accounts = await ethers.getSigners()
 
     if (!accounts[1])

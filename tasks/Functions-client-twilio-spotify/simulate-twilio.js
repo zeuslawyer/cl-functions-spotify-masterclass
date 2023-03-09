@@ -37,6 +37,7 @@ const {
       const { oracle, registry, linkToken } = await deployMockOracle()
   
       // Deploy the client contract
+      console.log("\n__Deploying Demo RecordLabel Contract__")
       const clientContractFactory = await ethers.getContractFactory("RecordLabel")
       const clientContract = await clientContractFactory.deploy(oracle.address, stableCoinContract.address)
       await clientContract.deployTransaction.wait(1)
@@ -67,7 +68,7 @@ const {
       await registry.addConsumer(subscriptionId, clientContract.address)
   
       // Build the parameters to make a request from the client contract
-      const requestConfig = require("../../Functions-request-config.js")
+      const requestConfig = require("../../Twilio-Spotify-RequestConfig.js")
       const validatedRequestConfig = getRequestConfig(requestConfig)
       // Fetch the DON public key from on-chain
       const DONPublicKey = await oracle.getDONPublicKey()
@@ -119,7 +120,7 @@ const {
   
         // Simulating the JavaScript code locally
         console.log("\nExecuting JavaScript request source code locally...")
-        const unvalidatedRequestConfig = require("../../Functions-request-config.js")
+        const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig.js")
         const requestConfig = getRequestConfig(unvalidatedRequestConfig)
   
         if (requestConfig.secretsLocation === 1) {

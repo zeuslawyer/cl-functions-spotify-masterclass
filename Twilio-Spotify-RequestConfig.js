@@ -52,6 +52,7 @@ const requestConfig = {
   // You *must* generate your own by following instructions in the READ ME for Off-chain secrets
   secretsURLs: [ 
     "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/ETH.txt",
+    // "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/POLY"
   ],
   // Default offchain secrets object used by the `functions-build-offchain-secrets` command
   globalOffchainSecrets: {

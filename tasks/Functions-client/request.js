@@ -50,7 +50,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
     )
     const registry = await RegistryFactory.attach(registryAddress)
 
-    const unvalidatedRequestConfig = require("../../Functions-request-config.js")
+    const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig.js")
     const requestConfig = getRequestConfig(unvalidatedRequestConfig)
 
     const request = await generateRequest(requestConfig, taskArgs)
@@ -131,6 +131,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
           console.log(Buffer.from(msg, "hex").toString())
         }
       })
+      
       // Listen for successful fulfillment
       let billingEndEventReceived = false
       let ocrResponseEventReceived = false
@@ -144,7 +145,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
         if (result !== "0x") {
           console.log(
             `Response returned to client contract represented as a hex string: ${result}\n${getDecodedResultLog(
-              require("../../Functions-request-config"),
+              require("../../Twilio-Spotify-RequestConfig.js"),
               result
             )}`
           )
@@ -188,7 +189,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
         }
       )
       // Initiate the on-chain request after all listeners are initialized
-      console.log(`\nRequesting new data for FunctionsConsumer contract ${contractAddr} on network ${network.name}`)
+      console.log(`\nRequesting new data for RecordLabel contract ${contractAddr} on network ${network.name}`)
       const requestTx = await clientContract.executeRequest(
         request.source,
         request.secrets ?? [],
