@@ -22,6 +22,8 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
 
     // Pretend your second wallet address is the Artist's wallet, and setup ArtistData on RecordLabel to point to your address.
     const artistAddress = accounts[1].address // This pretends your deployer wallet is the artist's.
+    
+    console.log(`\n Adding following artist data to RecordLabel: ${requestConfig.args}`)
     const [artistId, artistName, artistListenerCount, artistEmail] = requestConfig.args
 
     const clientContractFactory = await ethers.getContractFactory("RecordLabel")

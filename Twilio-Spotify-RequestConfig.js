@@ -47,8 +47,9 @@ const requestConfig = {
   // args in sequence are: ArtistID, artistname,  lastListenerCount, artist email
   args: ["ca22091a-3c00-11e9-974f-549f35141000", "Tones&I", "14000000", process.env.ARTIST_EMAIL, process.env.VERIFIED_SENDER], // TONES_AND_I, 14 million 
   // expected type of the returned value
-  expectedReturnType: ReturnType.uint256,
-  // Redundant URLs which point to encrypted off-chain secrets
+  expectedReturnType: ReturnType.int256,
+  // Redundant URLs which point to encrypted off-chain secrets. 
+  // You *must* generate your own by following instructions in the READ ME for Off-chain secrets
   secretsURLs: [ 
     "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/ETH.txt",
   ],
