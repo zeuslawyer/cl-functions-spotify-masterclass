@@ -10,7 +10,6 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol"; // NOTE: console.log only works in Hardhat local networks and the local functions simluation, not on testnets or mainnets.
 
-// TODO @Zubin cleanup
 interface IStableCoin is IERC20 {
   function mint(address to, uint256 amount) external;
 
@@ -151,8 +150,7 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     artistData[artistId].walletAddress = walletAddress;
   }
 
-  // TODO @Zubin make internal
-  function payArtist(string memory artistId, uint256 amountDue) public {
+  function payArtist(string memory artistId, uint256 amountDue) internal {
     IStableCoin token = IStableCoin(s_stc);
     if (artistData[artistId].walletAddress == address(0)) {
       revert RecordLabel_ArtistPaymentError(artistId, amountDue, "Artist has no wallet associated.");
