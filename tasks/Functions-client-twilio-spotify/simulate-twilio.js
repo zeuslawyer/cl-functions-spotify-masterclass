@@ -81,6 +81,10 @@ const {
         throw new Error("Artist Wallet Address missing - you may need to add a second private key to hardhat config.")
   
       const artistAddress = accounts[1].address // This pretends your deployer wallet is the artist's.
+      if (!artistAddress || !ethers.utils.isAddress(artistAddress)) {
+        throw new Error("Invalid Second Wallet Address. Please check SECOND_PRIVATE_KEY in env vars.")
+      }
+
       const artistId = requestConfig.args[0]
       const artistCurrentBalance = await stableCoinContract.balanceOf(artistAddress)
   

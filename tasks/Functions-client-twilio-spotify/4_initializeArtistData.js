@@ -22,7 +22,11 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
 
     // Pretend your second wallet address is the Artist's wallet, and setup ArtistData on RecordLabel to point to your address.
     const artistAddress = accounts[1].address // This pretends your deployer wallet is the artist's.
-    
+
+    if (!artistAddress || !ethers.utils.isAddress(artistAddress)) {
+      throw new Error("Invalid Second Wallet Address. Please check SECOND_PRIVATE_KEY in env vars.")
+    }
+
     console.log(`\n Adding following artist data to RecordLabel: ${requestConfig.args}`)
     const [artistId, artistName, artistListenerCount, artistEmail] = requestConfig.args
 

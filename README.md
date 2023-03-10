@@ -28,7 +28,9 @@ Before you get started we recommend you read the README in [the repo](https://gi
 
 6. Open this directory in your command line, then run `npm install` to install all dependencies.<br><br>
 
-7. Set the required environment variables. This can be done by copying the file *.env.example* to a new file named *.env*. (This renaming is important so that it won't be tracked by Git.) 
+7. Set the required environment variables. This can be done by copying the file *.env.example* to a new file named *.env*. (This renaming is important so that it won't be tracked by Git.)  
+
+**NOTE:** This example requires a second wallet private key!
   > :warning: DO NOT COMMIT YOUR .env FILE! The .gitignore file excludes .env but NOT .env.example 
 
   Make sure you have at least the following:
@@ -46,7 +48,6 @@ Before you get started we recommend you read the README in [the repo](https://gi
           
           # and
           PRIVATE_KEY="EVM wallet private key (Example: 6c0d*********************************************ac8da9)"
-
           SECOND_PRIVATE_KEY="SECONDWALLET KEY HERE"
    If you want to verify smart contracts using the `--verify` flag, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* must be set in your .env file so their values can be read in `Twilio-Spotify-RequestConfig.js`.<br><br> 
 
