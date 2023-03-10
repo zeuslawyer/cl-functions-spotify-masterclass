@@ -35,8 +35,8 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
         artistName,
         artistEmail,
         artistListenerCount,
-        0, //last paid amount - 18 decimal places
-        0, // total paid till date - 18 decimal places
+        0, //last paid amount: 18 decimal places
+        0, // total paid till date: 18 decimal places
         artistAddress
       )
       await setArtistDataTx.wait(1)

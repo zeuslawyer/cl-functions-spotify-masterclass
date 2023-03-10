@@ -30,7 +30,7 @@ if (latestListenerCount > lastListenerCount) {
 
   await sendEmail(latestListenerCount, amountDue)
 } else {
-  console.log("\nArist is not due additional payments...")
+  console.log("\nArtist is not due additional payments...")
 }
 
 // The source code MUST return a Buffer or the request will return an error message

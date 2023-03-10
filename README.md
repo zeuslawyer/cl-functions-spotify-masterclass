@@ -73,26 +73,28 @@ accounts: process.env.PRIVATE_KEY
 
 10. You can test an end-to-end request and fulfillment locally by simulating it using:<br>`npx hardhat functions-simulate-twilio --gaslimit 300000`.  This will spin up a local hardhat network and then deploy contracts and mock contracts to it, and run and e2e series of commands. Each of these commands is broken down below<br><br>
 
+**Note:**  Steps specific to this use case are contained in `./tasks/Functions-client-twilio-spotify/<STEP #>_<<TASK NAME>>.js`.   The rest are contained in other domain-specific folders in `./tasks`.<br><br>
 
-11.  Step 1: run the task to deploy the STC contract for payouts.  `npx hardhat functions-deploy-stablecoin --network sepolia --verify true`
+
+11.  Step 1: run the task to deploy the STC contract for payouts.  `npx hardhat functions-deploy-stablecoin --network sepolia --verify true` <br><br>
 
 12. Step 2: Deploy the RecordLabel smart contract.
-`npx hardhat functions-deploy-recordlabel --network sepolia --stc-contract <<0x-contract-address>>  --verify true`
+`npx hardhat functions-deploy-recordlabel --network sepolia --stc-contract <<0x-contract-address>>  --verify true` <br><br>
 
-13. Step 3: Approve the RecordLabel contract to use the StableCoin deployer's token balance to pay artists
-`npx hardhat functions-approve-spender --network sepolia --client-contract <<0x-contract-address>>   --stc-contract <<0x-contract-address>>`
+13. Step 3: Approve the RecordLabel contract to spend the StableCoin deployer's token balance to pay artists
+`npx hardhat functions-approve-spender --network sepolia --client-contract <<0x-contract-address>>   --stc-contract <<0x-contract-address>>` <br><br>
 
 14. Step 4: initialize artist data so the artist has a wallet address we can send payouts to.
-`npx hardhat functions-initialize-artist --network sepolia --client-contract <<0x-contract-address>>`
+`npx hardhat functions-initialize-artist --network sepolia --client-contract <<0x-contract-address>>`<br><br>
 
 15. Step 5: Create a Subscription and fund it with 3 to 5 LINK (network spikes can cause LINK-ETH exchange rates to fluctuate, so more tokens protects against that weird errors!). Add the RecordLabel client as an authorised consumer
-`npx hardhat functions-sub-create --network sepolia --amount 1.5 --contract <<0x-client-contract-address>>`
+`npx hardhat functions-sub-create --network sepolia --amount 1.5 --contract <<0x-client-contract-address>>`<br><br>
 
 16. Step 6: send the code in `./Twilio-Spotify-Functions-Source-Example.js` to the RecordLabel Contract to initiate Chainlink Functions execution!
-`npx hardhat functions-request --network sepolia --contract <<0x-client-contract-address>> --subid <__<__Subscription Id from previous step__>> --gaslimit 300000`.  
-The tool will log helpful information on each step.  Note that unless you pass the flag `--simulate false` this command automatically invokes the local simulation once before commencing on-chain transactions. This means the email API will be hit once, as part of the simulation!
+`npx hardhat functions-request --network sepolia --contract <<0x-client-contract-address>> --subid <__<__Subscription Id from previous step__>> --gaslimit 300000`.  <br><br>
+The tool will log helpful information on each step.  Note that unless you pass the flag `--simulate false` this command automatically invokes the local simulation once before commencing on-chain transactions. This means the email API will be hit once, as part of the simulation!<br><br>
 
-At the end of it, you can check the wallet address that corresponds to your `process.env.SECOND_PRIVATE_KEY` and open it in the network's block explore. You should see STC tokens showing up, proving that your second address was paid out (because we pretended your second wallet address is the artist's, remember?)
+    At the end of it, you can check the wallet address that corresponds to your `process.env.SECOND_PRIVATE_KEY` and open it in the network's block explore. You should see STC tokens showing up, proving that your second address was paid out (because we pretended your second wallet address is the artist's, remember?)
 
 <img width="540" alt="Messenger" src="https://user-images.githubusercontent.com/8016129/224178593-e0dcf724-0d38-402c-8d28-84ab9f85dca1.png"> <span /><span />
 
