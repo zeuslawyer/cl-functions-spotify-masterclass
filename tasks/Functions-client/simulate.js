@@ -54,7 +54,7 @@ task("functions-simulate", "Simulates an end-to-end fulfillment locally for the 
     await registry.addConsumer(subscriptionId, client.address)
 
     // Build the parameters to make a request from the client contract
-    const requestConfig = require("../../Functions-request-config.js")
+    const requestConfig = require("../../Twilio-Spotify-RequestConfig")
     const validatedRequestConfig = getRequestConfig(requestConfig)
     // Fetch the mock DON public key
     const DONPublicKey = await oracle.getDONPublicKey()
@@ -80,7 +80,7 @@ task("functions-simulate", "Simulates an end-to-end fulfillment locally for the 
 
       // Simulating the JavaScript code locally
       console.log("\nExecuting JavaScript request source code locally...")
-      const unvalidatedRequestConfig = require("../../Functions-request-config.js")
+      const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig")
       const requestConfig = getRequestConfig(unvalidatedRequestConfig)
 
       if (requestConfig.secretsLocation === 1) {
