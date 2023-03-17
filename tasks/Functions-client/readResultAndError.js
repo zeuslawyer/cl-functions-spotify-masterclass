@@ -23,13 +23,18 @@ task(
     }
 
     let latestResponse = await clientContract.latestResponse()
+    console.log(`Fetched response from ${clientContract.address}`)
+
     if (latestResponse.length > 0 && latestResponse !== "0x") {
-      const requestConfig = require("../../Functions-request-config")
+      const requestConfig = require("../../Twilio-Spotify-RequestConfig")
       console.log(
         `\nOn-chain response represented as a hex string: ${latestResponse}\n${getDecodedResultLog(
           requestConfig,
           latestResponse
         )}`
       )
+    } else {
+    console.log(`LATEST RESPONSE NOT VALID? ${latestResponse}`)
+
     }
   })

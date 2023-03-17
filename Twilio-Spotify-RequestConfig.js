@@ -27,8 +27,6 @@ const ReturnType = {
   Buffer: "Buffer",
 }
 
-// Copy the object below and paste it into Functions-request-config.js file
-// to assign it to the requestConfig  constant there.
 const requestConfig = {
   // location of source code (only Inline is currently supported)
   codeLocation: Location.Inline,

@@ -11,7 +11,7 @@ const runSimulation = async (requestConfig) => {
 }
 
 ;(async () => {
-  const unvalidatedRequestConfig = require("../Functions-request-config.js")
+  const unvalidatedRequestConfig = require("../Twilio-Spotify-RequestConfig")
   const requestConfig = getRequestConfig(unvalidatedRequestConfig)
 
   if (requestConfig.secretsLocation === 1) {
