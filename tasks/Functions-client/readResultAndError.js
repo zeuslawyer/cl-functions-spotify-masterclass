@@ -26,7 +26,7 @@ task(
     console.log(`Fetched response from ${clientContract.address}`)
 
     if (latestResponse.length > 0 && latestResponse !== "0x") {
-      const requestConfig = require("../../Twilio-Spotify-RequestConfig")
+      const requestConfig = require("../../Functions-request-config.js")
       console.log(
         `\nOn-chain response represented as a hex string: ${latestResponse}\n${getDecodedResultLog(
           requestConfig,

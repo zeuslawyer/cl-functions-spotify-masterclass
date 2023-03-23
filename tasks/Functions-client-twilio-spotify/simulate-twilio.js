@@ -68,7 +68,7 @@ const {
       await registry.addConsumer(subscriptionId, clientContract.address)
   
       // Build the parameters to make a request from the client contract
-      const requestConfig = require("../../Twilio-Spotify-RequestConfig.js")
+      const requestConfig = require("../../Functions-request-config.js")
       const validatedRequestConfig = getRequestConfig(requestConfig)
       // Fetch the DON public key from on-chain
       const DONPublicKey = await oracle.getDONPublicKey()
@@ -124,7 +124,7 @@ const {
   
         // Simulating the JavaScript code locally
         console.log("\nExecuting JavaScript request source code locally...")
-        const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig.js")
+        const unvalidatedRequestConfig = require("../../Functions-request-config.js")
         const requestConfig = getRequestConfig(unvalidatedRequestConfig)
   
         if (requestConfig.secretsLocation === 1) {

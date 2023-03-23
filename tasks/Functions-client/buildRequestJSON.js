@@ -19,7 +19,7 @@ task("functions-build-request", "Creates a JSON file with Functions request para
       )
     }
 
-    const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig")
+    const unvalidatedRequestConfig = require("../../Functions-request-config.js")
     const requestConfig = getRequestConfig(unvalidatedRequestConfig)
 
     const request = await generateRequest(requestConfig, taskArgs)

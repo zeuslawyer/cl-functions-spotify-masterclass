@@ -50,7 +50,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
     )
     const registry = await RegistryFactory.attach(registryAddress)
 
-    const unvalidatedRequestConfig = require("../../Twilio-Spotify-RequestConfig.js")
+    const unvalidatedRequestConfig = require("../../Functions-request-config.js")
     const requestConfig = getRequestConfig(unvalidatedRequestConfig)
 
     const request = await generateRequest(requestConfig, taskArgs)
@@ -145,7 +145,7 @@ task("functions-request", "Initiates a request from a Functions client contract"
         if (result !== "0x") {
           console.log(
             `Response returned to client contract represented as a hex string: ${result}\n${getDecodedResultLog(
-              require("../../Twilio-Spotify-RequestConfig.js"),
+              require("../../Functions-request-config.js"),
               result
             )}`
           )

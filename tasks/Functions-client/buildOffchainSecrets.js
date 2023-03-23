@@ -13,7 +13,7 @@ task(
       throw Error("This command cannot be used on a local hardhat chain.")
     }
 
-    const requestConfig = require("../../Twilio-Spotify-RequestConfig")
+    const requestConfig = require("../../Functions-request-config.js")
 
     // Verify that perNodeOffchainSecrets and/or secrets is correctly specified in the config
     if (requestConfig.perNodeOffchainSecrets && !Array.isArray(requestConfig.perNodeOffchainSecrets)) {
