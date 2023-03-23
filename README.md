@@ -49,7 +49,7 @@ Before you get started we recommend you read the README in [the repo](https://gi
           # and
           PRIVATE_KEY="EVM wallet private key (Example: 6c0d*********************************************ac8da9)"
           SECOND_PRIVATE_KEY="SECONDWALLET KEY HERE"
-   If you want to verify smart contracts using the `--verify` flag, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* must be set in your .env file so their values can be read in `Twilio-Spotify-RequestConfig.js`.<br><br> 
+   If you want to verify smart contracts using the `--verify` flag, the *ETHERSCAN_API_KEY* or *POLYGONSCAN_API_KEY* must be set in your .env file so their values can be read in `Functions-request-config.js`.<br><br> 
 
 8. Study the file `./Twilio-Spotify-Functions-Source-Example.js`. Note how it accesses and uses arguments that you pass in, including the `VERIFIED_SENDER` constant.  Then study the `RecordLabel` contract in `../../contracts/sample-apps/RecordLabel.sol` which makes the request and receives the results sent by the Functions source code example. The request is initiated via `executeRequest()` and the DON will return the output of your custom code in the `fulfillRequest()` callback.  <br><br> 
 
@@ -91,7 +91,7 @@ accounts: process.env.PRIVATE_KEY
 15. Step 5: Create a Subscription and fund it with 3 to 5 LINK (network spikes can cause LINK-ETH exchange rates to fluctuate, so more tokens protects against that weird errors!). Add the RecordLabel client as an authorised consumer
 `npx hardhat functions-sub-create --network sepolia --amount 1.5 --contract <<0x-client-contract-address>>`<br><br>
 
-16. Step 6:  Setup your Twilio and Soundchart API keys using Chainlink Off-Chain Secrets by following <a href="https://github.com/smartcontractkit/functions-hardhat-starter-kit#off-chain-secrets" target="_blank">this guidance in the CLI Tool's README.</a> Using off-chain secrets, your secrets are encrypted and then loadable from a URL rather than being passed onto the blockchain. Make sure you've added your secrets to your `.env` file and in your`Twilio-Spotify-RequestConfig.js` file. Then to generate the encrypted secrets JSON file, run the command `npx hardhat functions-build-offchain-secrets --network network_name_here` <br><br>
+16. Step 6:  Setup your Twilio and Soundchart API keys using Chainlink Off-Chain Secrets by following <a href="https://github.com/smartcontractkit/functions-hardhat-starter-kit#off-chain-secrets" target="_blank">this guidance in the CLI Tool's README.</a> Using off-chain secrets, your secrets are encrypted and then loadable from a URL rather than being passed onto the blockchain. Make sure you've added your secrets to your `.env` file and in your`Functions-request-config.js` file. Then to generate the encrypted secrets JSON file, run the command `npx hardhat functions-build-offchain-secrets --network sepolia` <br><br>
 
 17. Step 7: send the code in `./Twilio-Spotify-Functions-Source-Example.js` to the RecordLabel Contract to initiate Chainlink Functions execution!
 `npx hardhat functions-request --network sepolia --contract <<0x-client-contract-address>> --subid <__<__Subscription Id from previous step__>> --gaslimit 300000`.  <br><br>

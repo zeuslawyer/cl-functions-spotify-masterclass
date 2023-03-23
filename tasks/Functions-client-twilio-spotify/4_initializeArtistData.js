@@ -14,7 +14,7 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
     if (!ethers.utils.isAddress(recordLabelAddress))
       throw Error("Please provide a valid contract address for the SimpleStableCoin contract")
 
-    const requestConfig = require("../../Twilio-Spotify-RequestConfig.js")
+    const requestConfig = require("../../Functions-request-config.js")
     const accounts = await ethers.getSigners()
 
     if (!accounts[1])
@@ -46,7 +46,7 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
       await setArtistDataTx.wait(1)
     } catch (error) {
       console.log(
-        `\nError writing artist data for ${requestConfig.args[0]} at address ${artistAddress} to the Record Label: ${error}`
+        `\nError writing artist data for ${artistId} at address ${artistAddress} to the Record Label: ${error}`
       )
       throw error
     }
