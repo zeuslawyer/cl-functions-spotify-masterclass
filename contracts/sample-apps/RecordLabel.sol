@@ -88,7 +88,6 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     bytes32 assignedReqID = sendRequest(req, subscriptionId, gasLimit);
     latestRequestId = assignedReqID;
     latestArtistRequestedId = args[0];
-
     return assignedReqID;
   }
 

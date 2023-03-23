@@ -46,7 +46,7 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
       await setArtistDataTx.wait(1)
     } catch (error) {
       console.log(
-        `\nError writing artist data for ${requestConfig.args[0]} at address ${artistAddress} to the Record Label: ${error}`
+        `\nError writing artist data for ${artistId} at address ${artistAddress} to the Record Label: ${error}`
       )
       throw error
     }
