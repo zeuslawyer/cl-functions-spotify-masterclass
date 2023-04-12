@@ -114,4 +114,3 @@ This sample uses the Chainlink Functions tooling forked from [this repo](https:/
 
 To get a full list of powerful and flexible commands available using the Chainlink Functions CLI tool, please visit the [ repo's command glossary](https://github.com/smartcontractkit/functions-hardhat-starter-kit#command-glossary). 
 
-
