@@ -34,7 +34,6 @@ task(
         )}`
       )
     } else {
-    console.log(`LATEST RESPONSE NOT VALID? ${latestResponse}`)
-
+      console.log(`LATEST RESPONSE NOT VALID? ${latestResponse}`)
     }
   })
