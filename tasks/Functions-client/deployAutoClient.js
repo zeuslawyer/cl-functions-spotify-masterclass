@@ -48,6 +48,8 @@ task("functions-deploy-auto-client", "Deploys the AutomatedFunctionsConsumer con
 
     await addClientConsumerToSubscription(taskArgs.subid, autoClientContract.address)
 
+    taskArgs.contract = autoClientContract.address
+
     await setAutoRequest(autoClientContract.address, taskArgs)
 
     const verifyContract = taskArgs.verify
@@ -58,12 +60,17 @@ task("functions-deploy-auto-client", "Deploys the AutomatedFunctionsConsumer con
         await autoClientContract.deployTransaction.wait(Math.max(6 - VERIFICATION_BLOCK_CONFIRMATIONS, 0))
         await run("verify:verify", {
           address: autoClientContract.address,
-          constructorArguments: [networkConfig[network.name]["functionsOracleProxy"], taskArgs.subid, taskArgs.gaslimit, taskArgs.interval],
+          constructorArguments: [
+            networkConfig[network.name]["functionsOracleProxy"],
+            taskArgs.subid,
+            taskArgs.gaslimit,
+            taskArgs.interval,
+          ],
         })
         console.log("Contract verified")
       } catch (error) {
         if (!error.message.includes("Already Verified")) {
-          console.log("Error verifying contract.  Try delete the ./build folder and try again.")
+          console.log("Error verifying contract.  Delete the build folder and try again.")
           console.log(error)
         } else {
           console.log("Contract already verified")

@@ -1,8 +1,6 @@
 const { types } = require("hardhat/config")
 const { VERIFICATION_BLOCK_CONFIRMATIONS, networkConfig } = require("../../network-config")
 
-
-
 task("functions-approve-spender", "Approves RecordLabel to pay STC to artist")
   .addParam("stcContract", "Contract address for the Simple Stable Coin")
   .addParam("clientContract", "Contract address for RecordLabel")
@@ -36,10 +34,8 @@ task("functions-approve-spender", "Approves RecordLabel to pay STC to artist")
     const stableCoinFactory = await ethers.getContractFactory("SimpleStableCoin")
     const stableCoinContract = await stableCoinFactory.attach(stcAddress)
     const deployerTokenBalance = await stableCoinContract.balanceOf(deployer.address)
-    
+
     await stableCoinContract.approve(recordLabelAddress, deployerTokenBalance)
 
     console.log("\nRecordLabel is now approved to pay artists...")
-
-
   })

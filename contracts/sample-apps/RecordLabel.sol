@@ -8,7 +8,9 @@ import "../dev/functions/FunctionsClient.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol"; // NOTE: console.log only works in Hardhat local networks and the local functions simluation, not on testnets or mainnets.
+
+// TODO @Zubin disable solhint
+// import "hardhat/console.sol"; // NOTE: console.log only works in Hardhat local networks and the local functions simluation, not on testnets or mainnets.
 
 interface IStableCoin is IERC20 {
   function mint(address to, uint256 amount) external;
@@ -53,21 +55,25 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
    *
    * @param oracle - The FunctionsOracle contract
    */
+  // https://github.com/protofire/solhint/issues/242
+  // solhint-disable-next-line no-empty-blocks
   constructor(address oracle, address stablecoin) FunctionsClient(oracle) ConfirmedOwner(msg.sender) {
     s_stc = stablecoin;
   }
 
   /**
    * @notice Send a simple request
+   *
    * @param source JavaScript source code
    * @param secrets Encrypted secrets payload
    * @param args List of arguments accessible from within the source code
    * @param subscriptionId Billing ID
+   * @param gasLimit Maximum amount of gas used to call the client contract's `handleOracleFulfillment` function
+   * @return Functions request ID
    */
   function executeRequest(
     string calldata source,
     bytes calldata secrets,
-    Functions.Location secretsLocation,
     string[] calldata args, // args in sequence are: ArtistID, artistname,  lastListenerCount, artist email
     uint64 subscriptionId,
     uint32 gasLimit
@@ -76,11 +82,7 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
     req.initializeRequest(Functions.Location.Inline, Functions.CodeLanguage.JavaScript, source);
 
     if (secrets.length > 0) {
-      if (secretsLocation == Functions.Location.Inline) {
-        req.addInlineSecrets(secrets);
-      } else {
-        req.addRemoteSecrets(secrets);
-      }
+      req.addRemoteSecrets(secrets);
     }
     if (args.length > 0) req.addArgs(args);
 
@@ -120,7 +122,8 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
       // Artist gets 1 STC per  10000 additional streams.
       uint256 amountDue = (uint256(diffListenerCount) * 1 * 10 ** stcDecimals) / 10000;
 
-      console.log("\nAmount Due To Artist: ", amountDue);
+      // TODO @Zubin disable solhint
+      // console.log("\nAmount Due To Artist: ", amountDue);
 
       payArtist(artistId, amountDue);
 
