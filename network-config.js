@@ -1,6 +1,3 @@
-// Loads environment variables from .env file (if it exists)
-require("dotenv").config()
-
 const getLinkEthPriceFeed = () => {
   if (process.env.MAINNET_RPC_URL) return "0xdc530d9457755926550b59e8eccdae7624181557"
   if (process.env.POLYGON_MAINNET_RPC_URL) return "0xb77fa460604b9c6435a235d057f7d319ac83cb53"

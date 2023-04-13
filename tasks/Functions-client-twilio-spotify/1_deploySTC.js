@@ -47,5 +47,5 @@ task("functions-deploy-stablecoin", "Deploys the SimpleStableCoin contract for T
       console.log("\nPOLYGONSCAN_API_KEY or ETHERSCAN_API_KEY missing. Skipping contract verification...")
     }
 
-    console.log(`\tStableCCoin contract deployed to ${stcContract.address} on ${network.name}`)
+    console.log(`\tStableCoin contract deployed to ${stcContract.address} on ${network.name}`)
   })

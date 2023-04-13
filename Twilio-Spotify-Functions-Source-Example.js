@@ -45,6 +45,7 @@ return Buffer.concat([Functions.encodeInt256(latestListenerCount), Functions.enc
 // ====================
 // Helper Functions
 // ====================
+
 async function getLatestMonthlyListenerCount() {
   console.log("\nFetching artist data from API...")
   /* To make an HTTP request, use the Functions.makeHttpRequest function
@@ -154,4 +155,6 @@ TwiLink Records
     console.log("\nFailed when sending email.")
     throw error
   }
+
+  console.log("\nSent email...")
 }
