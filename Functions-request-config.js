@@ -31,7 +31,6 @@ const requestConfig = {
   // string containing the source code to be executed. Relative path used.
   source: fs.readFileSync("./Twilio-Spotify-Functions-Source-Example.js").toString(),
   // Per-node secrets objects assigned to each DON member. When using per-node secrets, nodes can only use secrets which they have been assigned.
-  perNodeSecrets: [],
   // ETH wallet key used to sign secrets so they cannot be accessed by a 3rd party
   walletPrivateKey: process.env["PRIVATE_KEY"],
   // args (string only array) can be accessed within the source code with `args[index]` (ie: args[0]).
@@ -48,8 +47,9 @@ const requestConfig = {
   expectedReturnType: ReturnType.int256,
   // Redundant URLs which point to encrypted off-chain secrets.
   // You *must* generate your own by following instructions in the READ ME for Off-chain secrets
+  // OR this documentation: https://docs.chain.link/chainlink-functions/tutorials/api-use-secrets-offchain
   secretsURLs: [
-    "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/ETH.txt",
+    // "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/ETH.txt",
     // "https://gist.githubusercontent.com/zeuslawyer/b307549406ad4c72b741efc5b1547332/raw/b977d4a9493faa17e4469cfdb01e260fec9c5df5/POLY"
   ],
   // Secrets can be accessed within the source code with `secrets.varName` (ie: secrets.apiKey). The secrets object can only contain string values.
