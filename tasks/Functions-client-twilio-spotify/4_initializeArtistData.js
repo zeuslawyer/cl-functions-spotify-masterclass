@@ -27,8 +27,14 @@ task("functions-initialize-artist", "Seed RecordLabel with Artist Data")
       throw new Error("Invalid Second Wallet Address. Please check SECOND_PRIVATE_KEY in env vars.")
     }
 
-    console.log(`\n Adding following artist data to RecordLabel: ${requestConfig.args}`)
     const [artistId, artistName, artistListenerCount, artistEmail] = requestConfig.args
+    console.log(
+      "\n Adding following artist data to RecordLabel: ",
+      artistId,
+      artistName,
+      artistListenerCount,
+      artistEmail
+    )
 
     const clientContractFactory = await ethers.getContractFactory("RecordLabel")
     const clientContract = await clientContractFactory.attach(recordLabelAddress)

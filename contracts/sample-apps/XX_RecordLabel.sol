@@ -9,6 +9,9 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+// TODO @Zubin disable solhint
+// import "hardhat/console.sol"; // NOTE: console.log only works in Hardhat local networks and the local functions simluation, not on testnets or mainnets.
+
 interface IStableCoin is IERC20 {
   function mint(address to, uint256 amount) external;
 
@@ -51,7 +54,6 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
    * @notice Executes once when a contract is created to initialize state variables
    *
    * @param oracle - The FunctionsOracle contract
-   * @param stablecoin - stablecoin contract address for paying the artists.
    */
   // https://github.com/protofire/solhint/issues/242
   // solhint-disable-next-line no-empty-blocks
@@ -69,7 +71,27 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
    * @param gasLimit Maximum amount of gas used to call the client contract's `handleOracleFulfillment` function
    * @return Functions request ID
    */
-  // TODO: implement executeRequest()
+  function executeRequest(
+    string calldata source,
+    bytes calldata secrets,
+    string[] calldata args, // args in sequence are: ArtistID, artistname,  lastListenerCount, artist email
+    uint64 subscriptionId,
+    uint32 gasLimit
+  ) public onlyOwner returns (bytes32) {
+    Functions.Request memory req;
+    req.initializeRequest(Functions.Location.Inline, Functions.CodeLanguage.JavaScript, source);
+
+    if (secrets.length > 0) {
+      req.addRemoteSecrets(secrets);
+    }
+    if (args.length > 0) req.addArgs(args);
+
+    // Update storage variables.
+    bytes32 assignedReqID = sendRequest(req, subscriptionId, gasLimit);
+    latestRequestId = assignedReqID;
+    latestArtistRequestedId = args[0];
+    return assignedReqID;
+  }
 
   /**
    * @notice Callback that is invoked once the DON has resolved the request or hit an error
@@ -79,7 +101,38 @@ contract RecordLabel is FunctionsClient, ConfirmedOwner {
    * @param err Aggregated error from the user code or from the execution pipeline
    * Either response or error parameter will be set, but never both
    */
-  //TODO implement fulfillRequest()
+  function fulfillRequest(bytes32 requestId, bytes memory response, bytes memory err) internal override {
+    latestError = err;
+    emit OCRResponse(requestId, response, err);
+
+    // Artist contract for payment logic here.
+    // Artist gets a fixed rate for every addition 1000 active monthly listeners.
+    bool nilErr = (err.length == 0);
+    if (nilErr) {
+      string memory artistId = latestArtistRequestedId;
+      (int256 latestListenerCount, int256 diffListenerCount) = abi.decode(response, (int256, int256));
+
+      if (diffListenerCount <= 0) {
+        // No payments due.
+        return;
+      }
+
+      // Pay the artist at 'artistData[latestArtistRequestedId].walletAddress'.
+      uint8 stcDecimals = IStableCoin(s_stc).decimals();
+      // Artist gets 1 STC per  10000 additional streams.
+      uint256 amountDue = (uint256(diffListenerCount) * 1 * 10 ** stcDecimals) / 10000;
+
+      // TODO @Zubin disable solhint
+      // console.log("\nAmount Due To Artist: ", amountDue);
+
+      payArtist(artistId, amountDue);
+
+      // Update Artist Mapping.
+      artistData[artistId].lastListenerCount = uint256(latestListenerCount);
+      artistData[artistId].lastPaidAmount = amountDue;
+      artistData[artistId].totalPaid += amountDue;
+    }
+  }
 
   function setArtistData(
     string memory artistId,
