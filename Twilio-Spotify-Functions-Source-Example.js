@@ -19,13 +19,13 @@ if (isNaN(lastListenerCount)) {
   throw new Error(`Listener Count is NaN: ${lastListenerCount}`)
 }
 
-// TODO Implement logic to calculate payment due
+// TODO #2: Implement logic to calculate payment due
 
 // ====================
 // Helper Functions
 // ====================
 async function getLatestMonthlyListenerCount() {
-  // TODO implement getLatestMonthlyListenerCount()
+  // TODO #1: implement getLatestMonthlyListenerCount()
 }
 
 // Use Twilio Sendgrid API to send emails.
@@ -34,5 +34,5 @@ async function sendEmail(latestListenerCount, amountDue) {
   if (!secrets.twilioApiKey) {
     return
   }
-  // TODO:  Your Stretch Assignment!
+  // TODO #3:  Your Stretch Assignment!
 }

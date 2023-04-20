@@ -11,4 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * @dev this will inheri the interface as describe in https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20
  * @dev 1 STC has 18 decimal places.
  */
-// TODO implemenet SimpleStableCoin contract.
+
+contract SimpleStableCoin is ERC20 {
+  // TODO implemenet SimpleStableCoin contract.
+}
