@@ -117,7 +117,7 @@ module.exports = {
     },
     mumbai: {
       url: MUMBAI_RPC_URL ?? "UNSET",
-      // accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      gasPrice: 5_000_000_000,
       accounts:
         process.env.PRIVATE_KEY && process.env.SECOND_PRIVATE_KEY
           ? [process.env.PRIVATE_KEY, process.env.SECOND_PRIVATE_KEY]

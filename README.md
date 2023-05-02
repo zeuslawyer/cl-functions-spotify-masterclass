@@ -1,13 +1,12 @@
 # Repo for the Chainlink Functions Deep Dive Masterclass
-This repo houses code prepared to demonstrate the power of Chainlink Functions. Chainlink Functions is a powerhouse technology that helps blockchain engineers connect their Decentralized Applications to **any** data source or API on Earth. While keeping API keys and secrets secure (through encryption), and having the data returned from decentralized computation run through 
-Chainlink's consensul protocol, to ensure that the data returned to your smart contract is
+This repo houses code prepared to demonstrate the power of Chainlink Functions. Chainlink Functions is a powerhouse technology that helps blockchain engineers connect their Decentralized Applications to **any** data source or API on Earth. While keeping API keys and secrets secure (through encryption), and having the data returned from decentralized computation run through Chainlink's consensus protocol, to ensure that the data returned to your smart contract is
 - trust minimized
 - verifiably cryptographically truthful
 
 The Masterclass will be held on 2 May 2023, at 5pm EST.  Details can be found [here](https://go.chain.link/masterclass/functions-module-1).
 
 
-> **Important**
+> **⚠️⚠️⚠️ Important ⚠️⚠️⚠️**
 > registration is compulsory!
 
 Chainlink Functions is currently in a closed beta. Request access to use Chainlink Functions at https://functions.chain.link.
@@ -26,4 +25,15 @@ The smart contract calculates how much STC is payable to the recording artist (i
 <img width="540" alt="Messenger" src="https://user-images.githubusercontent.com/8016129/224178418-27f62a67-d44a-4fb4-8e74-c4c967f312dd.png"> <span /><span />
 
 ## Instruction Manual
-A step by step written manual for the workshop is available [here](https://TODO.com).
+A step by step written manual for the workshop is available [here](https://docs.google.com/document/d/e/2PACX-1vQh2ZN_K6QpIK1ebt8BjSAwdMZCBgZXSxPYTTaI7dufvM8k2odO9bHpbYlgT6GIobGCfDbIv9c_4czs/pub).
+
+The basic workflow is as follows.  There are only three pieces that we need to prepare: 
+- the Custom Code we want executed using Chainlink's decentralized oracle network
+- the request configuration and 
+- the Consumer/Client smart contract that receives this configuration in its `executeRequest()` method.
+
+![Workflow components In Functions](https://user-images.githubusercontent.com/8016129/235579898-fe5441a0-ea1f-4f88-bb2b-153f35062d25.png)
+
+After that, the rest of the heavy lifting is done by the Chainlink Decentralized Oracle Network, **including the fully decentralized execution of the custom code you provide,and the application of Chainlink's Off Chain Reporting consensus protocal to the results of the computation done in your custom code!**.  
+
+The repo provides a bunch of Hardhat Tasks that give you CLI-based tooling to deploy contracts, trigger Chainlink Functions, encrypt secrets that are available off-chain etc.

@@ -41,6 +41,8 @@ const requestConfig = {
   expectedReturnType: ReturnType.uint256,
   // Redundant URLs which point to encrypted off-chain secrets
   secrets:{},
+  // Per-node secrets objects assigned to each DON member. 
+  // When using per-node secrets, nodes can only use secrets which they have been assigned.
   perNodeSecrets: [],
 }
 
